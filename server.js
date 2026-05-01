@@ -9,7 +9,11 @@ const FileSync = require('lowdb/adapters/FileSync');
 const { v4: uuidv4 } = require('uuid');
 
 // ── DB ─────────────────────────────────────────────────────────────────────
-const adapter = new FileSync(path.join(__dirname, 'data', 'db.json'));
+// Vercel has a read-only filesystem except /tmp
+const dbPath = process.env.VERCEL
+  ? '/tmp/db.json'
+  : path.join(__dirname, 'data', 'db.json');
+const adapter = new FileSync(dbPath);
 const db = low(adapter);
 db.defaults({ leads: [], contacts: [] }).write();
 
@@ -154,8 +158,10 @@ app.use((req, res) => {
 
 // ── Start ──────────────────────────────────────────────────────────────────
 const fs = require('fs');
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+if (!process.env.VERCEL) {
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+}
 
 app.listen(PORT, () => {
   console.log(`
