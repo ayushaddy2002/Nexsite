@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexsite Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --font-display:'Instrument Serif',serif;
+  --font-body:'Barlow',sans-serif;
+  --bg:#08080a;--surface:#111114;--border:rgba(255,255,255,.08);
+  --text:#fff;--muted:rgba(255,255,255,.45);--accent:#fff;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{background:none;border:none;cursor:pointer;color:inherit;font:inherit}
+
+/* ── Login ────────────────────────────────── */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+.login-box{
+  width:100%;max-width:400px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:24px;padding:48px 40px;
+  box-shadow:0 32px 80px rgba(0,0,0,.5);
+}
+.login-logo{
+  font-family:var(--font-display);font-style:italic;
+  font-size:28px;color:#fff;letter-spacing:-.5px;
+  display:flex;align-items:center;gap:10px;margin-bottom:32px;
+}
+.login-logo-dot{width:8px;height:8px;background:#fff;border-radius:50%}
+.login-label{font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.login-input{
+  width:100%;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;font-size:14px;color:#fff;
+  font-family:var(--font-body);outline:none;
+  transition:border-color .2s;
+}
+.login-input:focus{border-color:rgba(255,255,255,.25)}
+.login-btn{
+  width:100%;margin-top:20px;padding:13px;
+  background:#fff;color:#000;font-weight:700;font-size:14px;
+  font-family:var(--font-body);border-radius:9999px;
+  transition:opacity .2s;
+}
+.login-btn:hover{opacity:.88}
+.login-err{color:#ff6b6b;font-size:12px;margin-top:10px;min-height:18px}
+
+/* ── App shell ────────────────────────────── */
+#app{display:none;min-height:100vh}
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:220px;
+  background:rgba(255,255,255,.015);
+  border-right:1px solid var(--border);
+  padding:28px 16px;
+  display:flex;flex-direction:column;gap:4px;
+  z-index:10;
+}
+.sidebar-logo{
+  font-family:var(--font-display);font-style:italic;
+  font-size:22px;color:#fff;letter-spacing:-.5px;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:28px;padding:0 8px;
+}
+.sidebar-logo-dot{width:6px;height:6px;background:#fff;border-radius:50%}
+.sidebar-section{
+  font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.25);padding:8px 10px 4px;margin-top:12px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:10px;font-size:13px;
+  font-weight:400;color:rgba(255,255,255,.5);
+  transition:all .15s;cursor:pointer;
+}
+.nav-item:hover,.nav-item.active{
+  background:rgba(255,255,255,.06);color:#fff;
+}
+.nav-item svg{opacity:.6}
+.nav-item.active svg{opacity:1}
+.sidebar-foot{margin-top:auto;padding:0 8px}
+.logout-btn{
+  font-size:12px;color:rgba(255,255,255,.3);
+  display:flex;align-items:center;gap:6px;
+  transition:color .2s;
+}
+.logout-btn:hover{color:rgba(255,255,255,.7)}
+
+.main{margin-left:220px;padding:40px 48px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+
+/* ── Page header ─────────────────────────── */
+.page-header{margin-bottom:36px}
+.page-title{
+  font-family:var(--font-display);font-style:italic;
+  font-size:clamp(1.8rem,3vw,2.6rem);line-height:.95;
+  letter-spacing:-.5px;color:#fff;margin-bottom:6px;
+}
+.page-sub{font-size:14px;color:var(--muted);font-weight:300}
+
+/* ── Stat cards ──────────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:22px 24px;
+}
+.stat-card-val{
+  font-family:var(--font-display);font-style:italic;
+  font-size:2.4rem;color:#fff;line-height:1;margin-bottom:6px;
+}
+.stat-card-label{font-size:12px;color:var(--muted);font-weight:300}
+
+/* ── Table ───────────────────────────────── */
+.table-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;overflow:hidden;
+}
+.table-toolbar{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 24px;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.toolbar-title{font-size:14px;font-weight:500;flex:1}
+.search-input{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:9999px;padding:7px 14px;font-size:12px;
+  color:#fff;font-family:var(--font-body);outline:none;
+  transition:border-color .2s;width:220px;
+}
+.search-input:focus{border-color:rgba(255,255,255,.2)}
+.search-input::placeholder{color:rgba(255,255,255,.2)}
+.filter-select{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:9999px;padding:7px 14px;font-size:12px;
+  color:#fff;font-family:var(--font-body);outline:none;
+  -webkit-appearance:none;cursor:pointer;
+}
+.filter-select option{background:#111}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:12px 24px;text-align:left;
+  font-size:10px;font-weight:500;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--border);
+}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody td{padding:14px 24px;font-size:13px;font-weight:300;color:rgba(255,255,255,.75);vertical-align:middle}
+.td-name{font-weight:500;color:#fff}
+.td-email{color:var(--muted)}
+.td-plan{
+  display:inline-flex;padding:3px 10px;border-radius:9999px;font-size:11px;
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.65);font-weight:500;
+}
+.badge-status{
+  display:inline-flex;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:500;
+}
+.badge-new{background:rgba(100,200,255,.12);color:rgba(100,200,255,.9)}
+.badge-contacted{background:rgba(200,180,255,.12);color:rgba(200,180,255,.9)}
+.badge-closed{background:rgba(100,220,130,.12);color:rgba(100,220,130,.9)}
+.td-actions{display:flex;align-items:center;gap:8px}
+.action-btn{
+  padding:5px 12px;border-radius:9999px;font-size:11px;font-weight:500;
+  border:1px solid var(--border);color:rgba(255,255,255,.5);
+  transition:all .15s;
+}
+.action-btn:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.2)}
+.action-btn.del{color:rgba(255,100,100,.6);border-color:rgba(255,100,100,.15)}
+.action-btn.del:hover{background:rgba(255,100,100,.1);color:rgba(255,100,100,.9);border-color:rgba(255,100,100,.3)}
+.table-empty{padding:48px;text-align:center;color:var(--muted);font-size:14px;font-weight:300}
+.table-footer{padding:14px 24px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+
+/* ── Toast ───────────────────────────────── */
+#toast{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  background:rgba(255,255,255,.08);border:1px solid var(--border);
+  backdrop-filter:blur(20px);border-radius:12px;padding:12px 18px;
+  font-size:13px;font-weight:400;color:#fff;
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  transform:translateY(8px);
+}
+#toast.show{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* ── Responsive ──────────────────────────── */
+@media(max-width:900px){
+  .sidebar{width:64px;padding:20px 8px}
+  .sidebar-logo span,.sidebar-section,.nav-item span,.sidebar-foot{display:none}
+  .nav-item{justify-content:center;padding:10px}
+  .main{margin-left:64px;padding:24px}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr}
+  thead th:nth-child(n+4),tbody td:nth-child(n+4){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Login ──────────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="login-logo-dot"></span>
+      Nexsite
+    </div>
+    <label class="login-label" for="admin-key-input">Admin Key</label>
+    <input id="admin-key-input" class="login-input" type="password" placeholder="Enter admin key" autocomplete="current-password">
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- ── App ────────────────────────────────────────────── -->
+<div id="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo-dot"></span>
+      <span>Nexsite</span>
+    </div>
+    <div class="nav-item active" onclick="showPage('leads')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Leads</span>
+    </div>
+    <div class="nav-item" onclick="showPage('contacts')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <span>Messages</span>
+    </div>
+    <div class="sidebar-foot">
+      <button class="logout-btn" onclick="doLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Leads page -->
+    <div class="page active" id="page-leads">
+      <div class="page-header">
+        <h1 class="page-title">Leads</h1>
+        <p class="page-sub">Booking requests and enquiries</p>
+      </div>
+      <div class="stats-row" id="leads-stats"></div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <span class="toolbar-title">All Leads</span>
+          <input class="search-input" id="leads-search" type="text" placeholder="Search name or email…" oninput="renderLeads()">
+          <select class="filter-select" id="leads-filter" onchange="renderLeads()">
+            <option value="">All statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leads-body"></tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="leads-footer"></div>
+      </div>
+    </div>
+
+    <!-- Contacts page -->
+    <div class="page" id="page-contacts">
+      <div class="page-header">
+        <h1 class="page-title">Messages</h1>
+        <p class="page-sub">Contact form submissions</p>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <span class="toolbar-title">All Messages</span>
+          <input class="search-input" id="contacts-search" type="text" placeholder="Search…" oninput="renderContacts()">
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="contacts-body"></tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="contacts-footer"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let adminKey = '';
+let allLeads = [];
+let allContacts = [];
+
+// ── Login ──────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const key = document.getElementById('admin-key-input').value.trim();
+  if (!key) { showLoginErr('Please enter your admin key.'); return; }
+
+  const res = await fetch('/api/admin/leads', {
+    headers: { 'x-admin-key': key }
+  });
+  if (!res.ok) { showLoginErr('Invalid admin key. Try again.'); return; }
+
+  adminKey = key;
+  sessionStorage.setItem('nexsite_admin_key', key);
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadAll();
+}
+
+function showLoginErr(msg) {
+  document.getElementById('login-err').textContent = msg;
+}
+
+function doLogout() {
+  sessionStorage.removeItem('nexsite_admin_key');
+  location.reload();
+}
+
+document.getElementById('admin-key-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// Auto-login from session
+const savedKey = sessionStorage.getItem('nexsite_admin_key');
+if (savedKey) {
+  adminKey = savedKey;
+  document.getElementById('admin-key-input').value = savedKey;
+  setTimeout(() => doLogin(), 0);
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── Load data ──────────────────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadLeads(), loadContacts()]);
+}
+
+async function loadLeads() {
+  const res = await fetch('/api/admin/leads', { headers: { 'x-admin-key': adminKey } });
+  allLeads = await res.json();
+  renderLeads();
+}
+
+async function loadContacts() {
+  const res = await fetch('/api/admin/contacts', { headers: { 'x-admin-key': adminKey } });
+  allContacts = await res.json();
+  renderContacts();
+}
+
+// ── Render leads ───────────────────────────────────────────────────────────
+function renderLeads() {
+  const search = (document.getElementById('leads-search').value || '').toLowerCase();
+  const filter = document.getElementById('leads-filter').value;
+
+  const filtered = allLeads.filter(l => {
+    const matchSearch = !search ||
+      l.name.toLowerCase().includes(search) ||
+      l.email.toLowerCase().includes(search) ||
+      (l.company || '').toLowerCase().includes(search);
+    const matchFilter = !filter || l.status === filter;
+    return matchSearch && matchFilter;
+  });
+
+  // Stats
+  const statData = [
+    { label: 'Total Leads',  val: allLeads.length },
+    { label: 'New',          val: allLeads.filter(l=>l.status==='new').length },
+    { label: 'Contacted',    val: allLeads.filter(l=>l.status==='contacted').length },
+    { label: 'Closed',       val: allLeads.filter(l=>l.status==='closed').length },
+  ];
+  document.getElementById('leads-stats').innerHTML = statData.map(s => `
+    <div class="stat-card">
+      <div class="stat-card-val">${s.val}</div>
+      <div class="stat-card-label">${s.label}</div>
+    </div>`).join('');
+
+  const tbody = document.getElementById('leads-body');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="table-empty">No leads found.</td></tr>`;
+  } else {
+    tbody.innerHTML = filtered.map(l => `
+      <tr>
+        <td class="td-name">${esc(l.name)}</td>
+        <td class="td-email">${esc(l.email)}</td>
+        <td><span class="td-plan">${esc(l.plan)}</span></td>
+        <td>${l.company ? esc(l.company) : '<span style="color:rgba(255,255,255,.2)">—</span>'}</td>
+        <td><span class="badge-status badge-${l.status}">${l.status}</span></td>
+        <td>${fmtDate(l.createdAt)}</td>
+        <td>
+          <div class="td-actions">
+            ${l.status !== 'contacted' ? `<button class="action-btn" onclick="setStatus('${l.id}','contacted')">Mark Contacted</button>` : ''}
+            ${l.status !== 'closed'    ? `<button class="action-btn" onclick="setStatus('${l.id}','closed')">Close</button>` : ''}
+            <button class="action-btn del" onclick="deleteLead('${l.id}')">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('leads-footer').textContent =
+    `Showing ${filtered.length} of ${allLeads.length} leads`;
+}
+
+// ── Render contacts ────────────────────────────────────────────────────────
+function renderContacts() {
+  const search = (document.getElementById('contacts-search').value || '').toLowerCase();
+  const filtered = allContacts.filter(c =>
+    !search ||
+    c.name.toLowerCase().includes(search) ||
+    c.email.toLowerCase().includes(search) ||
+    (c.subject || '').toLowerCase().includes(search)
+  );
+
+  const tbody = document.getElementById('contacts-body');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">No messages yet.</td></tr>`;
+  } else {
+    tbody.innerHTML = filtered.map(c => `
+      <tr>
+        <td class="td-name">${esc(c.name)}</td>
+        <td class="td-email">${esc(c.email)}</td>
+        <td>${esc(c.subject || '—')}</td>
+        <td style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.message)}</td>
+        <td>${fmtDate(c.createdAt)}</td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('contacts-footer').textContent =
+    `${filtered.length} message${filtered.length !== 1 ? 's' : ''}`;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────
+async function setStatus(id, status) {
+  await fetch(`/api/admin/leads/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+    body: JSON.stringify({ status })
+  });
+  await loadLeads();
+  showToast(`Marked as ${status}`);
+}
+
+async function deleteLead(id) {
+  if (!confirm('Delete this lead? This cannot be undone.')) return;
+  await fetch(`/api/admin/leads/${id}`, {
+    method: 'DELETE',
+    headers: { 'x-admin-key': adminKey }
+  });
+  await loadLeads();
+  showToast('Lead deleted');
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
