@@ -9,8 +9,17 @@ const FileSync = require('lowdb/adapters/FileSync');
 const { v4: uuidv4 } = require('uuid');
 
 // ── DB ─────────────────────────────────────────────────────────────────────
-const adapter = new FileSync(path.join(__dirname, 'data', 'db.json'));
-const db = low(adapter);
+const Memory = require('lowdb/adapters/Memory');
+const isVercel = !!process.env.VERCEL;
+let db;
+if (isVercel) {
+  db = low(new Memory());
+} else {
+  const fs = require('fs');
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+  db = low(new FileSync(path.join(dataDir, 'db.json')));
+}
 db.defaults({ leads: [], contacts: [] }).write();
 
 // ── App ────────────────────────────────────────────────────────────────────
@@ -153,11 +162,7 @@ app.use((req, res) => {
 });
 
 // ── Start ──────────────────────────────────────────────────────────────────
-const fs = require('fs');
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-
-app.listen(PORT, () => {
+if (!isVercel) app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════╗
 ║         Nexsite Server               ║
