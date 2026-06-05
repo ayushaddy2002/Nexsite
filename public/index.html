@@ -183,12 +183,18 @@ img,video{display:block}
 /* ============================================================
    HERO
    ============================================================ */
-#hero-scroll-container{height:180vh}
+#hero-scroll-container{height:300vh;position:relative}
 #hero{
-  position:sticky;top:0;height:100vh;
+  position:sticky;top:0;height:100vh;z-index:10;
   display:flex;flex-direction:column;overflow:hidden;
   background:#000;
   will-change:transform;
+}
+#how{
+  position:sticky;top:0;height:100vh;z-index:5;
+  margin-top:-100vh;opacity:0;
+  transform:scale(.97) translateY(24px);
+  overflow:hidden;
 }
 #hero-video{display:none}
 .hero-overlay{display:none}
@@ -740,7 +746,8 @@ footer{
   .nav-hamburger{display:flex}
 
   #hero{height:100vh;min-height:unset;background:#000}
-  #hero-scroll-container{height:180vh}
+  #hero-scroll-container{height:300vh}
+  #how{height:auto;margin-top:0;position:relative}
   #hero-video,#hero .hero-overlay,#hero .hero-grain{display:none}
   .hero-content{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 20px 32px;justify-content:flex-start}
   .hero-h1{margin-top:0;margin-bottom:16px}
@@ -1109,28 +1116,8 @@ footer{
 
   </div>
 </section>
-</div><!-- end #hero-scroll-container -->
 
-<!-- ============================================================
-     MARQUEE
-     ============================================================ -->
-<div class="marquee-section">
-  <div class="marquee-track" id="marquee">
-    <div class="marquee-item"><span class="marquee-text">Free Lifetime Maintenance</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">24/7 Availability</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">In-Person Client Meetings</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">Affordable</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">Free Lifetime Maintenance</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">24/7 Availability</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">In-Person Client Meetings</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">Affordable</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">Free Lifetime Maintenance</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">24/7 Availability</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">In-Person Client Meetings</span><span class="marquee-dot"></span></div>
-    <div class="marquee-item"><span class="marquee-text">Affordable</span><span class="marquee-dot"></span></div>
-  </div>
-</div>
-
+<!-- HOW IT WORKS — sticky reveal behind hero -->
 <!-- ============================================================
      HOW IT WORKS
      ============================================================ -->
@@ -1141,15 +1128,15 @@ footer{
   <div class="video-overlay-dark"></div>
   <div class="fade-top-200"></div>
   <div class="fade-bottom-200"></div>
-  <div class="how-content">
-    <div class="badge glass reveal" style="border-radius:9999px;margin-bottom:20px">How It Works</div>
-    <h2 class="t-display reveal reveal-d1" style="font-size:clamp(2.8rem,6vw,5rem);margin-bottom:20px;text-align:center;max-width:700px">
+  <div class="how-content" id="how-content-inner">
+    <div class="badge glass" style="border-radius:9999px;margin-bottom:20px">How It Works</div>
+    <h2 class="t-display" style="font-size:clamp(2.8rem,6vw,5rem);margin-bottom:20px;text-align:center;max-width:700px">
       You dream it,<br>we build it<br>&amp; maintain it forever
     </h2>
-    <p class="reveal reveal-d2" style="font-size:15px;font-weight:300;color:rgba(255,255,255,.55);max-width:500px;text-align:center;line-height:1.65;font-family:var(--font-body)">
+    <p style="font-size:15px;font-weight:300;color:rgba(255,255,255,.55);max-width:500px;text-align:center;line-height:1.65;font-family:var(--font-body)">
       Share your vision. Our developers handle everything — design, development, and lifetime support. Built fast. Maintained forever.
     </p>
-    <div class="how-steps reveal reveal-d3">
+    <div class="how-steps" style="margin-top:48px">
       <div class="how-step glass" style="border-radius:20px">
         <div class="step-num">01</div>
         <div class="step-title">Brief</div>
@@ -1172,12 +1159,35 @@ footer{
       </div>
     </div>
     <div style="height:32px"></div>
-    <a href="https://wa.me/918123454398" target="_blank" rel="noopener" class="btn btn-primary glass-strong reveal reveal-d4" style="border-radius:9999px">
+    <a href="https://wa.me/918123454398" target="_blank" rel="noopener" class="btn btn-primary glass-strong" style="border-radius:9999px">
       Start Your Project
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
     </a>
   </div>
 </section>
+
+</div><!-- end #hero-scroll-container -->
+
+<!-- ============================================================
+     MARQUEE
+     ============================================================ -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <div class="marquee-item"><span class="marquee-text">Free Lifetime Maintenance</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">24/7 Availability</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">In-Person Client Meetings</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Affordable</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Free Lifetime Maintenance</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">24/7 Availability</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">In-Person Client Meetings</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Affordable</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Free Lifetime Maintenance</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">24/7 Availability</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">In-Person Client Meetings</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Affordable</span><span class="marquee-dot"></span></div>
+  </div>
+</div>
+
 
 
 <!-- ============================================================
@@ -1650,20 +1660,32 @@ function initHeroTransition(){
   if(!container) return;
 
   const heroContent = document.querySelector('.hero-content');
+  const howSection  = document.getElementById('how');
 
   lenis.on('scroll', ({scroll}) => {
     const scrollable = container.offsetHeight - window.innerHeight;
     const p = Math.min(Math.max(scroll / scrollable, 0), 1);
-    const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+
+    // Hero out: completes at p=0.55
+    const heroP = Math.min(p / 0.55, 1);
+    const heroE = heroP < 0.5 ? 2*heroP*heroP : -1+(4-2*heroP)*heroP;
+
+    // How in: starts at p=0.4, completes at p=0.85
+    const howRaw = Math.min(Math.max((p - 0.4) / 0.45, 0), 1);
+    const howE   = howRaw < 0.5 ? 2*howRaw*howRaw : -1+(4-2*howRaw)*howRaw;
 
     if(heroContent){
-      heroContent.style.opacity   = Math.max(0, 1 - ease * 2);
-      heroContent.style.transform = `scale(${1 - ease * 0.07}) translateY(${-ease * 70}px)`;
-      heroContent.style.filter    = `blur(${ease * 5}px)`;
+      heroContent.style.opacity   = Math.max(0, 1 - heroE * 1.8);
+      heroContent.style.transform = `scale(${1 - heroE * 0.07}) translateY(${-heroE * 70}px)`;
+      heroContent.style.filter    = `blur(${heroE * 5}px)`;
     }
     if(heroVideoEl){
-      heroVideoEl.style.transform = `scale(${1 + ease * 0.12}) translateZ(0)`;
-      heroVideoEl.style.filter    = `saturate(0) brightness(${1 - ease * 0.3})`;
+      heroVideoEl.style.transform = `scale(${1 + heroE * 0.12}) translateZ(0)`;
+      heroVideoEl.style.filter    = `saturate(0) brightness(${1 - heroE * 0.4})`;
+    }
+    if(howSection){
+      howSection.style.opacity   = howE;
+      howSection.style.transform = `scale(${0.96 + howE * 0.04}) translateY(${(1 - howE) * 32}px)`;
     }
   });
 }
