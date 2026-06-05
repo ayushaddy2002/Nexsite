@@ -1636,11 +1636,12 @@ const lenis = new Lenis({
 
 // ── Hero sticky scroll transition (runs every RAF tick) ────────────────────
 const _heroContainer = document.getElementById('hero-scroll-container');
+const _heroSection   = document.getElementById('hero');
 const _heroContent   = document.querySelector('.hero-content');
 const _heroVideoEl   = document.getElementById('hero-video');
 const _howSection    = document.getElementById('how');
 
-// Set how section invisible immediately so it starts hidden
+// Set how section invisible immediately
 if(_howSection){
   _howSection.style.opacity   = '0';
   _howSection.style.transform = 'scale(0.92) translateY(40px)';
@@ -1662,14 +1663,13 @@ function updateHeroTransition(){
   const howRaw = Math.min(Math.max((p - 0.35) / 0.5, 0), 1);
   const howE   = howRaw < 0.5 ? 2*howRaw*howRaw : -1+(4-2*howRaw)*howRaw;
 
-  if(_heroContent){
-    _heroContent.style.opacity   = Math.max(0, 1 - heroE * 1.8);
-    _heroContent.style.transform = `scale(${1 - heroE * 0.07}) translateY(${-heroE * 70}px)`;
-    _heroContent.style.filter    = `blur(${heroE * 5}px)`;
+  // Fade entire #hero section so black background disappears revealing #how
+  if(_heroSection){
+    _heroSection.style.opacity   = String(Math.max(0, 1 - heroE * 1.8));
+    _heroSection.style.transform = `scale(${1 - heroE * 0.05}) translateY(${-heroE * 40}px)`;
   }
-  if(_heroVideoEl){
-    _heroVideoEl.style.transform = `scale(${1 + heroE * 0.12}) translateZ(0)`;
-    _heroVideoEl.style.filter    = `saturate(0) brightness(${1 - heroE * 0.4})`;
+  if(_heroContent){
+    _heroContent.style.filter = `blur(${heroE * 5}px)`;
   }
   if(_howSection){
     _howSection.style.opacity   = String(howE);
