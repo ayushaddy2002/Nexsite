@@ -181,21 +181,23 @@ img,video{display:block}
 .nav-right-btn:hover{opacity:.8}
 
 /* ============================================================
-   HERO
+   SECTION PANELS — full-screen fixed with scroll transitions
    ============================================================ */
-#hero-scroll-container{height:350vh;position:relative}
-#hero{
-  position:sticky;top:0;height:100vh;z-index:10;
-  display:flex;flex-direction:column;overflow:hidden;
-  will-change:transform;
-}
-#how{
-  position:sticky;top:0;height:100vh;z-index:5;
-  margin-top:-100vh;
-  display:flex;flex-direction:column;
+#scroll-spacer{pointer-events:none}
+#hero,#how,#why,#process,#stats,#pricing,#faq,#cta{
+  position:fixed;top:0;left:0;right:0;height:100vh;
   overflow:hidden;
   will-change:opacity,transform,filter;
 }
+/* Z-indices: hero highest (covers everything), cta lowest */
+#hero{z-index:88}#how{z-index:87}#why{z-index:86}
+#process{z-index:85}#stats{z-index:84}
+#pricing{z-index:83}#faq{z-index:82}#cta{z-index:81}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero{display:flex;flex-direction:column}
 #hero-video{display:none}
 .hero-overlay{display:none}
 .hero-grain{display:none}
@@ -738,9 +740,6 @@ footer{
   .nav-right-btn{display:none}
   .nav-hamburger{display:flex}
 
-  #hero{height:100vh;min-height:unset}
-  #hero-scroll-container{height:350vh}
-  #how{height:auto;min-height:unset;margin-top:0;position:relative;opacity:1;filter:none;transform:none}
   #hero-video,#hero .hero-overlay,#hero .hero-grain{display:none}
   .hero-content{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 20px 32px;justify-content:flex-start}
   .hero-h1{margin-top:0;margin-bottom:16px}
@@ -1058,10 +1057,12 @@ footer{
   </nav>
 </div>
 
+<!-- SCROLL SPACER — provides scroll distance for all section transitions -->
+<div id="scroll-spacer"></div>
+
 <!-- ============================================================
      HERO
      ============================================================ -->
-<div id="hero-scroll-container">
 <section id="hero">
   <video id="hero-video" autoplay loop muted playsinline poster="" style="filter:saturate(0)">
     <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4" type="video/mp4">
@@ -1159,7 +1160,6 @@ footer{
   </div>
 </section>
 
-</div><!-- end #hero-scroll-container -->
 
 
 
@@ -1455,17 +1455,18 @@ footer{
       </a>
     </div>
   </div>
-  <footer>
-    <a href="#" class="footer-logo">Nexsite</a>
-    <div class="footer-copy">© 2026 Nexsite. All rights reserved.</div>
-    <div class="footer-links">
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
-      <a href="#">Twitter</a>
-    </div>
-  </footer>
 </section>
+
+<footer id="site-footer" style="position:fixed;bottom:0;left:0;right:0;z-index:80;opacity:0;pointer-events:none;transition:opacity .5s ease">
+  <a href="#" class="footer-logo">Nexsite</a>
+  <div class="footer-copy">© 2026 Nexsite. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+    <a href="#">Twitter</a>
+  </div>
+</footer>
 
 <!-- ============================================================
      JAVASCRIPT
@@ -1633,50 +1634,78 @@ const lenis = new Lenis({
   touchMultiplier: 1.8,
 });
 
-// ── Hero sticky scroll transition (runs every RAF tick) ────────────────────
-const _heroContainer = document.getElementById('hero-scroll-container');
-const _heroSection   = document.getElementById('hero');
-const _heroContent   = document.querySelector('.hero-content');
-const _heroVideoEl   = document.getElementById('hero-video');
-const _howSection    = document.getElementById('how');
+// ── Full-site section panel manager ───────────────────────────────────────
+const PANEL_IDS   = ['hero','how','why','process','stats','pricing','faq','cta'];
+const SECTION_VH  = 120;  // scroll distance per section (vh)
+const TRANS_VH    = 45;   // blur-in / blur-out transition distance (vh)
 
-// Set how section invisible immediately
-if(_howSection){
-  _howSection.style.opacity   = '0';
-  _howSection.style.transform = 'scale(0.92) translateY(40px)';
-  _howSection.style.filter    = 'blur(24px)';
-}
+// Set scroll spacer height
+(function(){
+  const spacer = document.getElementById('scroll-spacer');
+  if(spacer) spacer.style.height = (PANEL_IDS.length * SECTION_VH + TRANS_VH) + 'vh';
+})();
 
-function updateHeroTransition(){
-  if(!_heroContainer) return;
-  const scroll     = window.scrollY;
-  const scrollable = _heroContainer.offsetHeight - window.innerHeight;
-  if(scrollable <= 0) return;
-  const p = Math.min(Math.max(scroll / scrollable, 0), 1);
+// Cache panel elements
+const _panels = PANEL_IDS.map(id => document.getElementById(id));
+const _footer  = document.getElementById('site-footer');
 
-  // Hero fades out — done by p=0.5
-  const heroP = Math.min(p / 0.5, 1);
-  const heroE = heroP < 0.5 ? 2*heroP*heroP : -1+(4-2*heroP)*heroP;
+function easeInOut(t){ return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
-  // How fades in — starts p=0.35, done by p=0.85
-  const howRaw = Math.min(Math.max((p - 0.35) / 0.5, 0), 1);
-  const howE   = howRaw < 0.5 ? 2*howRaw*howRaw : -1+(4-2*howRaw)*howRaw;
+function updatePanels(){
+  const scroll  = window.scrollY;
+  const vh      = window.innerHeight;
+  const SEC_PX  = SECTION_VH  * vh / 100;
+  const TRAN_PX = TRANS_VH    * vh / 100;
 
-  if(_heroContent){
-    _heroContent.style.opacity   = String(Math.max(0, 1 - heroE * 1.8));
-    _heroContent.style.transform = `scale(${1 - heroE * 0.07}) translateY(${-heroE * 70}px)`;
-    _heroContent.style.filter    = `blur(${heroE * 5}px)`;
-  }
-  if(_howSection){
-    _howSection.style.opacity   = String(howE);
-    _howSection.style.transform = `scale(${0.92 + howE * 0.08}) translateY(${(1 - howE) * 40}px)`;
-    _howSection.style.filter    = `blur(${(1 - howE) * 24}px)`;
+  _panels.forEach((el, i) => {
+    if(!el) return;
+
+    const secStart  = i * SEC_PX;
+    const enterEnd  = secStart + TRAN_PX;
+    const exitStart = secStart + SEC_PX - TRAN_PX;
+    const secEnd    = secStart + SEC_PX;
+
+    let opacity, blur;
+
+    if(scroll <= secStart){
+      // Not reached yet — first panel starts visible
+      opacity = i === 0 ? 1 : 0;
+      blur    = i === 0 ? 0 : 20;
+    } else if(scroll < enterEnd){
+      // Entering — blur → clear
+      const e = easeInOut((scroll - secStart) / TRAN_PX);
+      opacity = e;
+      blur    = 20 * (1 - e);
+    } else if(scroll < exitStart){
+      // Fully active
+      opacity = 1; blur = 0;
+    } else if(scroll < secEnd){
+      // Exiting — clear → blur
+      const e = easeInOut((scroll - exitStart) / TRAN_PX);
+      opacity = 1 - e;
+      blur    = 20 * e;
+    } else {
+      // Passed
+      opacity = 0; blur = 20;
+    }
+
+    el.style.opacity        = String(opacity);
+    el.style.filter         = `blur(${blur}px)`;
+    el.style.pointerEvents  = opacity > 0.05 ? 'all' : 'none';
+  });
+
+  // Show footer when CTA section is fully active
+  if(_footer){
+    const ctaStart = (PANEL_IDS.length - 1) * SEC_PX + TRAN_PX;
+    const footerP  = Math.min(Math.max((scroll - ctaStart) / TRAN_PX, 0), 1);
+    _footer.style.opacity      = String(footerP);
+    _footer.style.pointerEvents = footerP > 0.5 ? 'all' : 'none';
   }
 }
 
 function lenisRaf(time){
   lenis.raf(time);
-  updateHeroTransition();
+  updatePanels();
   requestAnimationFrame(lenisRaf);
 }
 requestAnimationFrame(lenisRaf);
