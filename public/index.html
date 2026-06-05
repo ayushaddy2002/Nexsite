@@ -183,7 +183,7 @@ img,video{display:block}
 /* ============================================================
    HERO
    ============================================================ */
-#hero-scroll-container{height:300vh;position:relative}
+#hero-scroll-container{height:350vh;position:relative}
 #hero{
   position:sticky;top:0;height:100vh;z-index:10;
   display:flex;flex-direction:column;overflow:hidden;
@@ -193,8 +193,10 @@ img,video{display:block}
 #how{
   position:sticky;top:0;height:100vh;z-index:5;
   margin-top:-100vh;opacity:0;
-  transform:scale(.97) translateY(24px);
+  transform:scale(.92) translateY(40px);
+  filter:blur(24px);
   overflow:hidden;
+  will-change:opacity,transform,filter;
 }
 #hero-video{display:none}
 .hero-overlay{display:none}
@@ -746,8 +748,8 @@ footer{
   .nav-hamburger{display:flex}
 
   #hero{height:100vh;min-height:unset;background:#000}
-  #hero-scroll-container{height:300vh}
-  #how{height:auto;margin-top:0;position:relative}
+  #hero-scroll-container{height:350vh}
+  #how{height:auto;min-height:unset;margin-top:0;position:relative;opacity:1;filter:none;transform:none}
   #hero-video,#hero .hero-overlay,#hero .hero-grain{display:none}
   .hero-content{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 20px 32px;justify-content:flex-start}
   .hero-h1{margin-top:0;margin-bottom:16px}
@@ -1666,7 +1668,8 @@ function initHeroTransition(){
     }
     if(howSection){
       howSection.style.opacity   = howE;
-      howSection.style.transform = `scale(${0.96 + howE * 0.04}) translateY(${(1 - howE) * 32}px)`;
+      howSection.style.transform = `scale(${0.92 + howE * 0.08}) translateY(${(1 - howE) * 40}px)`;
+      howSection.style.filter    = `blur(${(1 - howE) * 24}px)`;
     }
   });
 }
