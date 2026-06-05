@@ -26,6 +26,53 @@ button{background:none;border:none;cursor:pointer;color:inherit;font:inherit}
 img,video{display:block}
 
 /* ============================================================
+   INTRO SPLASH
+   ============================================================ */
+#intro-splash{
+  position:fixed;inset:0;z-index:10000;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .9s cubic-bezier(.22,1,.36,1);
+}
+#intro-splash.done{opacity:0;pointer-events:none}
+.intro-logo{
+  display:flex;align-items:center;gap:14px;
+  animation:introLogoIn 1.4s cubic-bezier(.22,1,.36,1) .3s both;
+}
+.intro-dot{
+  width:10px;height:10px;background:#fff;border-radius:50%;
+  animation:introLogoIn 1.4s cubic-bezier(.22,1,.36,1) .3s both,
+             introDotPulse .8s ease-in-out 2.4s both;
+}
+.intro-name{
+  font-family:var(--font-display);font-style:italic;
+  font-size:clamp(2.8rem,8vw,5rem);color:#fff;
+  letter-spacing:-.5px;
+}
+.intro-tagline{
+  position:absolute;
+  bottom:calc(50% - 60px);
+  font-size:12px;font-weight:300;
+  color:rgba(255,255,255,.35);
+  font-family:var(--font-body);letter-spacing:2px;
+  text-transform:uppercase;
+  animation:introTagIn 1.2s cubic-bezier(.22,1,.36,1) 1s both;
+}
+@keyframes introLogoIn{
+  from{opacity:0;filter:blur(16px);transform:scale(.85)}
+  to{opacity:1;filter:blur(0);transform:scale(1)}
+}
+@keyframes introTagIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes introDotPulse{
+  0%{transform:scale(1);opacity:1}
+  50%{transform:scale(.4);opacity:.3}
+  100%{transform:scale(1);opacity:1}
+}
+
+/* ============================================================
    LIQUID GLASS EFFECTS
    ============================================================ */
 .glass{
@@ -934,6 +981,17 @@ footer{
 <body>
 
 <!-- ============================================================
+     INTRO SPLASH
+     ============================================================ -->
+<div id="intro-splash">
+  <div class="intro-logo">
+    <span class="intro-dot"></span>
+    <span class="intro-name">Nexsite</span>
+  </div>
+  <span class="intro-tagline">Built by Customers</span>
+</div>
+
+<!-- ============================================================
      BOOKING MODAL
      ============================================================ -->
 <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -1593,6 +1651,18 @@ document.getElementById('booking-form').addEventListener('submit', async functio
     setLoading(false);
   }
 });
+
+// ── Intro splash ───────────────────────────────────────────────────────────
+(function(){
+  const splash = document.getElementById('intro-splash');
+  // Lock scroll during intro
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    splash.classList.add('done');
+    document.body.style.overflow = '';
+    setTimeout(() => splash.remove(), 950);
+  }, 3200);
+})();
 
 // ── Slow video playback to 40s per loop ───────────────────────────────────
 document.querySelectorAll('#hero-video, .section-video').forEach(v => {
