@@ -1626,47 +1626,6 @@ document.querySelectorAll('#hero-video, .section-video').forEach(v => {
   });
 });
 
-// ── Hero sticky scroll transition ─────────────────────────────────────────
-function initHeroTransition(){
-  const container = document.getElementById('hero-scroll-container');
-  const heroCard   = document.querySelector('.hero-card');
-  const heroPartners = document.querySelector('.hero-partners');
-  const heroVideoEl  = document.getElementById('hero-video');
-  const heroLogoVid  = document.getElementById('hero-logo-video');
-  if(!container) return;
-
-  const heroContent = document.querySelector('.hero-content');
-  const howSection  = document.getElementById('how');
-
-  lenis.on('scroll', ({scroll}) => {
-    const scrollable = container.offsetHeight - window.innerHeight;
-    const p = Math.min(Math.max(scroll / scrollable, 0), 1);
-
-    // Hero out: completes at p=0.55
-    const heroP = Math.min(p / 0.55, 1);
-    const heroE = heroP < 0.5 ? 2*heroP*heroP : -1+(4-2*heroP)*heroP;
-
-    // How in: starts at p=0.4, completes at p=0.85
-    const howRaw = Math.min(Math.max((p - 0.4) / 0.45, 0), 1);
-    const howE   = howRaw < 0.5 ? 2*howRaw*howRaw : -1+(4-2*howRaw)*howRaw;
-
-    if(heroContent){
-      heroContent.style.opacity   = Math.max(0, 1 - heroE * 1.8);
-      heroContent.style.transform = `scale(${1 - heroE * 0.07}) translateY(${-heroE * 70}px)`;
-      heroContent.style.filter    = `blur(${heroE * 5}px)`;
-    }
-    if(heroVideoEl){
-      heroVideoEl.style.transform = `scale(${1 + heroE * 0.12}) translateZ(0)`;
-      heroVideoEl.style.filter    = `saturate(0) brightness(${1 - heroE * 0.4})`;
-    }
-    if(howSection){
-      howSection.style.opacity   = howE;
-      howSection.style.transform = `scale(${0.92 + howE * 0.08}) translateY(${(1 - howE) * 40}px)`;
-      howSection.style.filter    = `blur(${(1 - howE) * 24}px)`;
-    }
-  });
-}
-
 // ── Lenis smooth scroll ────────────────────────────────────────────────────
 const lenis = new Lenis({
   duration: 1.4,
@@ -1675,9 +1634,50 @@ const lenis = new Lenis({
   smoothTouch: true,
   touchMultiplier: 1.8,
 });
-function lenisRaf(time){ lenis.raf(time); requestAnimationFrame(lenisRaf); }
+
+// ── Hero sticky scroll transition (runs every RAF tick) ────────────────────
+const _heroContainer = document.getElementById('hero-scroll-container');
+const _heroContent   = document.querySelector('.hero-content');
+const _heroVideoEl   = document.getElementById('hero-video');
+const _howSection    = document.getElementById('how');
+
+function updateHeroTransition(){
+  if(!_heroContainer) return;
+  const scroll     = window.scrollY;
+  const scrollable = _heroContainer.offsetHeight - window.innerHeight;
+  if(scrollable <= 0) return;
+  const p = Math.min(Math.max(scroll / scrollable, 0), 1);
+
+  // Hero fades out — done by p=0.5
+  const heroP = Math.min(p / 0.5, 1);
+  const heroE = heroP < 0.5 ? 2*heroP*heroP : -1+(4-2*heroP)*heroP;
+
+  // How fades in — starts p=0.35, done by p=0.85
+  const howRaw = Math.min(Math.max((p - 0.35) / 0.5, 0), 1);
+  const howE   = howRaw < 0.5 ? 2*howRaw*howRaw : -1+(4-2*howRaw)*howRaw;
+
+  if(_heroContent){
+    _heroContent.style.opacity   = Math.max(0, 1 - heroE * 1.8);
+    _heroContent.style.transform = `scale(${1 - heroE * 0.07}) translateY(${-heroE * 70}px)`;
+    _heroContent.style.filter    = `blur(${heroE * 5}px)`;
+  }
+  if(_heroVideoEl){
+    _heroVideoEl.style.transform = `scale(${1 + heroE * 0.12}) translateZ(0)`;
+    _heroVideoEl.style.filter    = `saturate(0) brightness(${1 - heroE * 0.4})`;
+  }
+  if(_howSection){
+    _howSection.style.opacity   = String(howE);
+    _howSection.style.transform = `scale(${0.92 + howE * 0.08}) translateY(${(1 - howE) * 40}px)`;
+    _howSection.style.filter    = `blur(${(1 - howE) * 24}px)`;
+  }
+}
+
+function lenisRaf(time){
+  lenis.raf(time);
+  updateHeroTransition();
+  requestAnimationFrame(lenisRaf);
+}
 requestAnimationFrame(lenisRaf);
-initHeroTransition();
 
 // ── Mobile menu ────────────────────────────────────────────────────────────
 function toggleMobileMenu() {
