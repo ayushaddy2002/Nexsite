@@ -1635,73 +1635,91 @@ const lenis = new Lenis({
 });
 
 // ── Full-site section panel manager ───────────────────────────────────────
-const PANEL_IDS   = ['hero','how','why','process','stats','pricing','faq','cta'];
-const SECTION_VH  = 120;  // scroll distance per section (vh)
-const TRANS_VH    = 45;   // blur-in / blur-out transition distance (vh)
+const PANEL_IDS = ['hero','how','why','process','stats','pricing','faq','cta'];
+const TRANS_VH  = 45; // enter/exit transition in vh
 
-// Set scroll spacer height
-(function(){
-  const spacer = document.getElementById('scroll-spacer');
-  if(spacer) spacer.style.height = (PANEL_IDS.length * SECTION_VH + TRANS_VH) + 'vh';
-})();
-
-// Cache panel elements
 const _panels = PANEL_IDS.map(id => document.getElementById(id));
 const _footer  = document.getElementById('site-footer');
+const _spacer  = document.getElementById('scroll-spacer');
+
+let _ranges = [];
 
 function easeInOut(t){ return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
-function updatePanels(){
-  const scroll  = window.scrollY;
-  const vh      = window.innerHeight;
-  const SEC_PX  = SECTION_VH  * vh / 100;
-  const TRAN_PX = TRANS_VH    * vh / 100;
+function buildRanges(){
+  const vh     = window.innerHeight;
+  const TRAN   = TRANS_VH * vh / 100;
+  let   cursor = 0;
 
-  _panels.forEach((el, i) => {
-    if(!el) return;
-
-    const secStart  = i * SEC_PX;
-    const enterEnd  = secStart + TRAN_PX;
-    const exitStart = secStart + SEC_PX - TRAN_PX;
-    const secEnd    = secStart + SEC_PX;
-
-    let opacity, blur;
-
-    if(scroll <= secStart){
-      // Not reached yet — first panel starts visible
-      opacity = i === 0 ? 1 : 0;
-      blur    = i === 0 ? 0 : 20;
-    } else if(scroll < enterEnd){
-      // Entering — blur → clear
-      const e = easeInOut((scroll - secStart) / TRAN_PX);
-      opacity = e;
-      blur    = 20 * (1 - e);
-    } else if(scroll < exitStart){
-      // Fully active
-      opacity = 1; blur = 0;
-    } else if(scroll < secEnd){
-      // Exiting — clear → blur
-      const e = easeInOut((scroll - exitStart) / TRAN_PX);
-      opacity = 1 - e;
-      blur    = 20 * e;
-    } else {
-      // Passed
-      opacity = 0; blur = 20;
-    }
-
-    el.style.opacity        = String(opacity);
-    el.style.filter         = `blur(${blur}px)`;
-    el.style.pointerEvents  = opacity > 0.05 ? 'all' : 'none';
+  _ranges = _panels.map((el) => {
+    // How much content overflows the viewport
+    const overflow = el ? Math.max(0, el.scrollHeight - vh) : 0;
+    const totalPx  = TRAN + overflow + TRAN;
+    const r = {
+      start:     cursor,
+      enterEnd:  cursor + TRAN,
+      exitStart: cursor + TRAN + overflow,
+      end:       cursor + totalPx,
+      overflow,
+    };
+    cursor += totalPx;
+    return r;
   });
 
-  // Show footer when CTA section is fully active
-  if(_footer){
-    const ctaStart = (PANEL_IDS.length - 1) * SEC_PX + TRAN_PX;
-    const footerP  = Math.min(Math.max((scroll - ctaStart) / TRAN_PX, 0), 1);
-    _footer.style.opacity      = String(footerP);
-    _footer.style.pointerEvents = footerP > 0.5 ? 'all' : 'none';
+  // Set spacer height so page is scrollable
+  if(_spacer) _spacer.style.height = cursor + 'px';
+}
+
+function updatePanels(){
+  const scroll = window.scrollY;
+
+  _panels.forEach((el, i) => {
+    if(!el || !_ranges[i]) return;
+    const r = _ranges[i];
+
+    let opacity, blur, ty = 0;
+
+    if(scroll <= r.start){
+      opacity = i === 0 ? 1 : 0;
+      blur    = i === 0 ? 0 : 20;
+    } else if(scroll < r.enterEnd){
+      // Blur → clear
+      const e = easeInOut((scroll - r.start) / (r.enterEnd - r.start));
+      opacity = e; blur = 20 * (1 - e); ty = 0;
+    } else if(scroll < r.exitStart){
+      // Fully active — scroll content up via translateY
+      opacity = 1; blur = 0;
+      ty = -(scroll - r.enterEnd);
+    } else if(scroll < r.end){
+      // Clear → blur (content stays at end position)
+      const e = easeInOut((scroll - r.exitStart) / (r.end - r.exitStart));
+      opacity = 1 - e; blur = 20 * e;
+      ty = -r.overflow;
+    } else {
+      opacity = 0; blur = 20;
+      ty = -r.overflow;
+    }
+
+    el.style.opacity      = String(opacity);
+    el.style.filter       = `blur(${blur}px)`;
+    el.style.transform    = `translate3d(0,${ty}px,0)`;
+    el.style.pointerEvents = opacity > 0.05 ? 'all' : 'none';
+  });
+
+  // Footer fades in during CTA active phase
+  if(_footer && _ranges[_ranges.length - 1]){
+    const r = _ranges[_ranges.length - 1];
+    const active = r.exitStart - r.enterEnd;
+    const p = active > 0
+      ? Math.min(Math.max((scroll - r.enterEnd) / active, 0), 1)
+      : (scroll >= r.enterEnd ? 1 : 0);
+    _footer.style.opacity      = String(p);
+    _footer.style.pointerEvents = p > 0.5 ? 'all' : 'none';
   }
 }
+
+buildRanges();
+window.addEventListener('resize', buildRanges);
 
 function lenisRaf(time){
   lenis.raf(time);
