@@ -187,7 +187,6 @@ img,video{display:block}
 #hero{
   position:sticky;top:0;height:100vh;z-index:10;
   display:flex;flex-direction:column;overflow:hidden;
-  background:#000;
   will-change:transform;
 }
 #how{
@@ -739,7 +738,7 @@ footer{
   .nav-right-btn{display:none}
   .nav-hamburger{display:flex}
 
-  #hero{height:100vh;min-height:unset;background:#000}
+  #hero{height:100vh;min-height:unset}
   #hero-scroll-container{height:350vh}
   #how{height:auto;min-height:unset;margin-top:0;position:relative;opacity:1;filter:none;transform:none}
   #hero-video,#hero .hero-overlay,#hero .hero-grain{display:none}
@@ -1663,13 +1662,10 @@ function updateHeroTransition(){
   const howRaw = Math.min(Math.max((p - 0.35) / 0.5, 0), 1);
   const howE   = howRaw < 0.5 ? 2*howRaw*howRaw : -1+(4-2*howRaw)*howRaw;
 
-  // Fade entire #hero section so black background disappears revealing #how
-  if(_heroSection){
-    _heroSection.style.opacity   = String(Math.max(0, 1 - heroE * 1.8));
-    _heroSection.style.transform = `scale(${1 - heroE * 0.05}) translateY(${-heroE * 40}px)`;
-  }
   if(_heroContent){
-    _heroContent.style.filter = `blur(${heroE * 5}px)`;
+    _heroContent.style.opacity   = String(Math.max(0, 1 - heroE * 1.8));
+    _heroContent.style.transform = `scale(${1 - heroE * 0.07}) translateY(${-heroE * 70}px)`;
+    _heroContent.style.filter    = `blur(${heroE * 5}px)`;
   }
   if(_howSection){
     _howSection.style.opacity   = String(howE);
