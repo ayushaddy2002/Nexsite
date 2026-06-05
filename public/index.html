@@ -789,6 +789,12 @@ footer{
 
   #hero{min-height:100vh;background:#000}
   #hero-video,#hero .hero-overlay,#hero .hero-grain{display:none}
+  #hero .glass,#hero .glass-strong{
+    background:transparent;
+    backdrop-filter:none;-webkit-backdrop-filter:none;
+    box-shadow:none;
+  }
+  #hero .glass::before,#hero .glass-strong::before{display:none}
   #how .section-video{display:none}
   #cta .section-video{display:none}
   .hero-content{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 20px;justify-content:center}
