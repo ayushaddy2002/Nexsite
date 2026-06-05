@@ -1649,27 +1649,21 @@ function initHeroTransition(){
   const heroLogoVid  = document.getElementById('hero-logo-video');
   if(!container) return;
 
+  const heroContent = document.querySelector('.hero-content');
+
   lenis.on('scroll', ({scroll}) => {
     const scrollable = container.offsetHeight - window.innerHeight;
     const p = Math.min(Math.max(scroll / scrollable, 0), 1);
-    const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p; // ease in-out
+    const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
 
-    if(heroCard){
-      heroCard.style.opacity     = Math.max(0, 1 - ease * 2.2);
-      heroCard.style.transform   = `scale(${1 - ease * 0.07}) translateY(${-ease * 70}px)`;
-      heroCard.style.filter      = `blur(${ease * 6}px)`;
-    }
-    if(heroPartners){
-      heroPartners.style.opacity   = Math.max(0, 1 - ease * 3);
-      heroPartners.style.transform = `translateY(${-ease * 40}px)`;
+    if(heroContent){
+      heroContent.style.opacity   = Math.max(0, 1 - ease * 2);
+      heroContent.style.transform = `scale(${1 - ease * 0.07}) translateY(${-ease * 70}px)`;
+      heroContent.style.filter    = `blur(${ease * 5}px)`;
     }
     if(heroVideoEl){
-      heroVideoEl.style.transform  = `scale(${1 + ease * 0.12}) translateZ(0)`;
-      heroVideoEl.style.filter     = `saturate(0) brightness(${1 - ease * 0.3})`;
-    }
-    if(heroLogoVid){
-      heroLogoVid.style.opacity  = Math.max(0, 1 - ease * 2);
-      heroLogoVid.style.transform = `scale(${1 - ease * 0.05})`;
+      heroVideoEl.style.transform = `scale(${1 + ease * 0.12}) translateZ(0)`;
+      heroVideoEl.style.filter    = `saturate(0) brightness(${1 - ease * 0.3})`;
     }
   });
 }
