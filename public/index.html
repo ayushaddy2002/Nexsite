@@ -183,10 +183,12 @@ img,video{display:block}
 /* ============================================================
    HERO
    ============================================================ */
+#hero-scroll-container{height:180vh}
 #hero{
-  position:relative;min-height:100vh;
+  position:sticky;top:0;height:100vh;
   display:flex;flex-direction:column;overflow:hidden;
   background:#000;
+  will-change:transform;
 }
 #hero-video{display:none}
 .hero-overlay{display:none}
@@ -737,7 +739,8 @@ footer{
   .nav-right-btn{display:none}
   .nav-hamburger{display:flex}
 
-  #hero{min-height:100vh;background:#000}
+  #hero{height:100vh;min-height:unset;background:#000}
+  #hero-scroll-container{height:180vh}
   #hero-video,#hero .hero-overlay,#hero .hero-grain{display:none}
   .hero-content{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 20px 32px;justify-content:flex-start}
   .hero-h1{margin-top:0;margin-bottom:16px}
@@ -1058,6 +1061,7 @@ footer{
 <!-- ============================================================
      HERO
      ============================================================ -->
+<div id="hero-scroll-container">
 <section id="hero">
   <video id="hero-video" autoplay loop muted playsinline poster="" style="filter:saturate(0)">
     <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4" type="video/mp4">
@@ -1105,6 +1109,7 @@ footer{
 
   </div>
 </section>
+</div><!-- end #hero-scroll-container -->
 
 <!-- ============================================================
      MARQUEE
@@ -1635,6 +1640,40 @@ document.querySelectorAll('#hero-video, .section-video').forEach(v => {
   });
 });
 
+// ── Hero sticky scroll transition ─────────────────────────────────────────
+function initHeroTransition(){
+  const container = document.getElementById('hero-scroll-container');
+  const heroCard   = document.querySelector('.hero-card');
+  const heroPartners = document.querySelector('.hero-partners');
+  const heroVideoEl  = document.getElementById('hero-video');
+  const heroLogoVid  = document.getElementById('hero-logo-video');
+  if(!container) return;
+
+  lenis.on('scroll', ({scroll}) => {
+    const scrollable = container.offsetHeight - window.innerHeight;
+    const p = Math.min(Math.max(scroll / scrollable, 0), 1);
+    const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p; // ease in-out
+
+    if(heroCard){
+      heroCard.style.opacity     = Math.max(0, 1 - ease * 2.2);
+      heroCard.style.transform   = `scale(${1 - ease * 0.07}) translateY(${-ease * 70}px)`;
+      heroCard.style.filter      = `blur(${ease * 6}px)`;
+    }
+    if(heroPartners){
+      heroPartners.style.opacity   = Math.max(0, 1 - ease * 3);
+      heroPartners.style.transform = `translateY(${-ease * 40}px)`;
+    }
+    if(heroVideoEl){
+      heroVideoEl.style.transform  = `scale(${1 + ease * 0.12}) translateZ(0)`;
+      heroVideoEl.style.filter     = `saturate(0) brightness(${1 - ease * 0.3})`;
+    }
+    if(heroLogoVid){
+      heroLogoVid.style.opacity  = Math.max(0, 1 - ease * 2);
+      heroLogoVid.style.transform = `scale(${1 - ease * 0.05})`;
+    }
+  });
+}
+
 // ── Lenis smooth scroll ────────────────────────────────────────────────────
 const lenis = new Lenis({
   duration: 1.4,
@@ -1645,6 +1684,7 @@ const lenis = new Lenis({
 });
 function lenisRaf(time){ lenis.raf(time); requestAnimationFrame(lenisRaf); }
 requestAnimationFrame(lenisRaf);
+initHeroTransition();
 
 // ── Mobile menu ────────────────────────────────────────────────────────────
 function toggleMobileMenu() {
