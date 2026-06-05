@@ -21,11 +21,6 @@ body{
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
-body::after{
-  content:'';position:fixed;inset:0;
-  z-index:50;opacity:.042;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
 a{text-decoration:none;color:inherit}
 button{background:none;border:none;cursor:pointer;color:inherit;font:inherit}
 img,video{display:block}
@@ -345,13 +340,7 @@ img,video{display:block}
 /* ============================================================
    FEATURES CHESS
    ============================================================ */
-#features{
-  padding:120px 60px;
-  background:
-    radial-gradient(ellipse 90% 55% at 78% 12%, rgba(22,22,32,1) 0%, #000 52%),
-    radial-gradient(ellipse 55% 45% at 12% 88%, rgba(16,16,26,1) 0%, #000 48%),
-    #000;
-}
+#features{padding:120px 60px;background:#000}
 .features-header{text-align:center;margin-bottom:90px}
 .chess-row{
   display:flex;gap:72px;align-items:center;
@@ -399,12 +388,7 @@ img,video{display:block}
 /* ============================================================
    WHY US GRID
    ============================================================ */
-#why{
-  padding:120px 60px;
-  background:
-    radial-gradient(ellipse 65% 65% at 22% 58%, rgba(20,20,30,1) 0%, #000 52%),
-    #000;
-}
+#why{padding:120px 60px;background:#000}
 .why-grid{
   display:grid;grid-template-columns:repeat(4,1fr);
   gap:20px;margin-top:60px;
@@ -428,12 +412,7 @@ img,video{display:block}
 /* ============================================================
    PROCESS SECTION
    ============================================================ */
-#process{
-  padding:120px 60px;
-  background:
-    radial-gradient(ellipse 70% 50% at 62% 22%, rgba(20,20,30,1) 0%, #000 52%),
-    #000;
-}
+#process{padding:120px 60px;background:#000}
 .process-inner{max-width:900px;margin:60px auto 0}
 .process-item{
   display:flex;gap:40px;align-items:flex-start;
@@ -517,13 +496,7 @@ img,video{display:block}
 /* ============================================================
    TESTIMONIALS
    ============================================================ */
-#testimonials{
-  padding:120px 60px;
-  background:
-    radial-gradient(ellipse 80% 55% at 72% 12%, rgba(22,22,32,1) 0%, #000 52%),
-    radial-gradient(ellipse 55% 45% at 28% 82%, rgba(16,16,26,1) 0%, #000 48%),
-    #000;
-}
+#testimonials{padding:120px 60px;background:#000}
 .testi-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
   gap:22px;margin-top:60px;
@@ -552,12 +525,7 @@ img,video{display:block}
 /* ============================================================
    PRICING
    ============================================================ */
-#pricing{
-  padding:120px 60px;
-  background:
-    radial-gradient(ellipse 60% 48% at 50% 8%, rgba(20,20,30,1) 0%, #000 50%),
-    #000;
-}
+#pricing{padding:120px 60px;background:#000}
 .pricing-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
   gap:20px;margin-top:60px;max-width:960px;margin-left:auto;margin-right:auto;
@@ -610,12 +578,7 @@ img,video{display:block}
 /* ============================================================
    FAQ
    ============================================================ */
-#faq{
-  padding:120px 60px;
-  background:
-    radial-gradient(ellipse 72% 52% at 32% 72%, rgba(18,18,28,1) 0%, #000 52%),
-    #000;
-}
+#faq{padding:120px 60px;background:#000}
 .faq-inner{max-width:700px;margin:60px auto 0}
 .faq-item{
   border-bottom:1px solid rgba(255,255,255,.06);
