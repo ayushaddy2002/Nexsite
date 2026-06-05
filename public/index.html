@@ -26,6 +26,22 @@ button{background:none;border:none;cursor:pointer;color:inherit;font:inherit}
 img,video{display:block}
 
 /* ============================================================
+   INTRO SPLASH
+   ============================================================ */
+#intro-splash{
+  position:fixed;inset:0;z-index:10000;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 1s cubic-bezier(.22,1,.36,1);
+}
+#intro-splash.done{opacity:0;pointer-events:none}
+#intro-video{
+  width:100%;height:100%;
+  object-fit:contain;
+  max-width:600px;
+}
+
+/* ============================================================
    LIQUID GLASS EFFECTS
    ============================================================ */
 .glass{
@@ -934,6 +950,15 @@ footer{
 <body>
 
 <!-- ============================================================
+     INTRO SPLASH
+     ============================================================ -->
+<div id="intro-splash">
+  <video id="intro-video" autoplay muted playsinline>
+    <source src="logo.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- ============================================================
      BOOKING MODAL
      ============================================================ -->
 <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -1593,6 +1618,25 @@ document.getElementById('booking-form').addEventListener('submit', async functio
     setLoading(false);
   }
 });
+
+// ── Intro splash ───────────────────────────────────────────────────────────
+(function(){
+  const splash = document.getElementById('intro-splash');
+  const vid    = document.getElementById('intro-video');
+  document.body.style.overflow = 'hidden';
+
+  function dismiss(){
+    splash.classList.add('done');
+    document.body.style.overflow = '';
+    setTimeout(() => splash.remove(), 1050);
+  }
+
+  // When video finishes, hold last frame 1s then fade out
+  vid.addEventListener('ended', () => setTimeout(dismiss, 1000));
+
+  // Fallback: if video fails to load or takes too long, dismiss after 6s
+  setTimeout(dismiss, 6000);
+})();
 
 // ── Slow video playback to 40s per loop ───────────────────────────────────
 document.querySelectorAll('#hero-video, .section-video').forEach(v => {
