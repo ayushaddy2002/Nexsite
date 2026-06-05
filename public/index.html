@@ -1664,6 +1664,14 @@ document.getElementById('booking-form').addEventListener('submit', async functio
   }
 });
 
+// ── Slow video playback to 40s per loop ───────────────────────────────────
+document.querySelectorAll('#hero-video, .section-video').forEach(v => {
+  v.addEventListener('loadedmetadata', () => {
+    const targetDuration = 40;
+    v.playbackRate = Math.max(0.1, v.duration / targetDuration);
+  });
+});
+
 // ── Mobile menu ────────────────────────────────────────────────────────────
 function toggleMobileMenu() {
   const ham  = document.getElementById('nav-ham');
