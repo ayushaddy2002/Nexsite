@@ -1609,16 +1609,14 @@ document.getElementById('booking-form').addEventListener('submit', async functio
   }
 });
 
-// ── Hero logo video — play once with sound, freeze on last frame ───────────
+// ── Hero logo video — play once muted, freeze on last frame ───────────────
 const heroLogoVid = document.getElementById('hero-logo-video');
 if(heroLogoVid){
-  // Start muted for autoplay, then unmute immediately
-  heroLogoVid.play().then(() => {
-    heroLogoVid.muted = false;
-  }).catch(() => {
-    // Browser blocked unmute — stays muted silently
+  heroLogoVid.muted = true;
+  heroLogoVid.addEventListener('ended', function(){
+    this.currentTime = this.duration;
+    this.pause();
   });
-  heroLogoVid.addEventListener('ended', () => heroLogoVid.pause());
 }
 
 // ── Slow video playback to 40s per loop ───────────────────────────────────
