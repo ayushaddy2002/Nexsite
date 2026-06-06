@@ -1722,9 +1722,10 @@ function updatePanels(){
       const e = easeInOut((scroll - r.start) / (r.enterEnd - r.start));
       opacity = e; blur = 20 * (1 - e);
     } else if (scroll < r.exitStart) {
-      // Fully clear — translate inner content upward to reveal overflow
+      // Fully clear — translate inner content upward to reveal overflow.
+      // Clamped by r.overflow so sections with overflow=0 (e.g. hero) never move.
       opacity = 1; blur = 0;
-      ty = -(scroll - r.enterEnd);
+      ty = -Math.min(scroll - r.enterEnd, r.overflow);
     } else if (scroll < r.end) {
       // Clear → blur (inner content stays at end position)
       const e = easeInOut((scroll - r.exitStart) / (r.end - r.exitStart));
