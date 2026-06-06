@@ -1685,10 +1685,18 @@ function buildRanges(){
       r = { start: 0, enterEnd: 0, exitStart: TRAN, end: 2 * TRAN, overflow: 0 };
       cursor = r.end;
     } else {
-      const totalPx = TRAN + overflow + TRAN;
-      r = { start: cursor, enterEnd: cursor + TRAN,
-            exitStart: cursor + TRAN + overflow, end: cursor + totalPx, overflow };
-      cursor += totalPx;
+      const isLast = i === _panels.length - 1;
+      if (isLast) {
+        // Last section (CTA): enters normally but never exits — stays fully visible.
+        // exitStart = end so there is no exit phase; spacer ends here.
+        r = { start: cursor, enterEnd: cursor + TRAN,
+              exitStart: cursor + TRAN + overflow, end: cursor + TRAN + overflow, overflow };
+      } else {
+        const totalPx = TRAN + overflow + TRAN;
+        r = { start: cursor, enterEnd: cursor + TRAN,
+              exitStart: cursor + TRAN + overflow, end: cursor + totalPx, overflow };
+      }
+      cursor += TRAN + overflow + (isLast ? 0 : TRAN);
     }
     return r;
   });
@@ -1723,7 +1731,12 @@ function updatePanels(){
       opacity = 1 - e; blur = 20 * e;
       ty = -r.overflow;
     } else {
-      opacity = 0; blur = 20;
+      // Past all transitions: last section stays fully visible, others hide.
+      if (i === _panels.length - 1) {
+        opacity = 1; blur = 0;
+      } else {
+        opacity = 0; blur = 20;
+      }
       ty = -r.overflow;
     }
 
