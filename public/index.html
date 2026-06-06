@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexsite — Built by Customers</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 <style>
 /* ============================================================
    RESET & BASE
@@ -1636,14 +1635,6 @@ document.querySelectorAll('#hero-video, .section-video').forEach(v => {
   });
 });
 
-// ── Lenis smooth scroll ────────────────────────────────────────────────────
-const lenis = new Lenis({
-  duration: 1.4,
-  easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-  smooth: true,
-  smoothTouch: true,
-  touchMultiplier: 1.8,
-});
 
 // ── Full-site section panel manager ───────────────────────────────────────
 const PANEL_IDS = ['hero','how','why','process','stats','pricing','faq','cta'];
@@ -1704,8 +1695,7 @@ function buildRanges(){
   if (_spacer) _spacer.style.height = cursor + 'px';
 }
 
-function updatePanels(){
-  const scroll = window.scrollY;
+function updatePanels(scroll){
 
   _panels.forEach((el, i) => {
     if (!el || !_ranges[i]) return;
@@ -1766,12 +1756,19 @@ function updatePanels(){
 buildRanges();
 window.addEventListener('resize', buildRanges);
 
-function lenisRaf(time){
-  lenis.raf(time);
-  updatePanels();
-  requestAnimationFrame(lenisRaf);
+// Native scroll — sections are position:fixed so no library needed.
+// A lightweight lerp gives smooth visual transitions on desktop too.
+let _lerpScroll = 0;
+function tick(){
+  const native = window.scrollY;
+  // Smooth interpolation: 12% per frame (~60fps) ≈ ~150ms feel
+  _lerpScroll += (native - _lerpScroll) * 0.12;
+  // Snap to native when close enough to avoid infinite drift
+  if (Math.abs(native - _lerpScroll) < 0.5) _lerpScroll = native;
+  updatePanels(_lerpScroll);
+  requestAnimationFrame(tick);
 }
-requestAnimationFrame(lenisRaf);
+requestAnimationFrame(tick);
 
 // ── Mobile menu ────────────────────────────────────────────────────────────
 function toggleMobileMenu() {
