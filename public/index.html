@@ -1678,8 +1678,8 @@ function buildRanges(){
     if (i === 0) {
       // Hero: no enter transition (already visible at scroll=0), no content scrolling.
       // overflow is forced to 0 — hero never translates its content up/down,
-      // Dwell for TRAN, fade over TRAN — matches the enter+exit timing of other sections.
-      r = { start: 0, enterEnd: 0, exitStart: TRAN, end: 2 * TRAN, overflow: 0 };
+      // No dwell — hero fades immediately on first swipe.
+      r = { start: 0, enterEnd: 0, exitStart: 0, end: TRAN, overflow: 0 };
       cursor = r.end;
     } else {
       const isLast = i === _panels.length - 1;
