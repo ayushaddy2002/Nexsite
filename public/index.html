@@ -1678,8 +1678,8 @@ function buildRanges(){
     if (i === 0) {
       // Hero: no enter transition (already visible at scroll=0), no content scrolling.
       // overflow is forced to 0 — hero never translates its content up/down,
-      // it simply dwells for TRAN px then fades over TRAN px.
-      r = { start: 0, enterEnd: 0, exitStart: TRAN, end: 2 * TRAN, overflow: 0 };
+      // Dwell for 2×TRAN (matches enter+active of other sections), fade over TRAN.
+      r = { start: 0, enterEnd: 0, exitStart: 2 * TRAN, end: 3 * TRAN, overflow: 0 };
       cursor = r.end;
     } else {
       const isLast = i === _panels.length - 1;
