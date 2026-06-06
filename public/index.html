@@ -640,7 +640,7 @@ img,video{display:block}
 }
 .cta-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:80px}
 footer{
-  position:relative;z-index:3;
+  position:relative;z-index:3;width:100%;
   padding:32px 60px;
   border-top:1px solid rgba(255,255,255,.07);
   display:flex;align-items:center;justify-content:space-between;
@@ -1459,18 +1459,17 @@ footer{
       </a>
     </div>
   </div>
+  <footer id="site-footer">
+    <a href="#" class="footer-logo">Nexsite</a>
+    <div class="footer-copy">© 2026 Nexsite. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+      <a href="#">Twitter</a>
+    </div>
+  </footer>
 </section>
-
-<footer id="site-footer" style="position:fixed;bottom:0;left:0;right:0;z-index:80;opacity:0;pointer-events:none;transition:opacity .5s ease">
-  <a href="#" class="footer-logo">Nexsite</a>
-  <div class="footer-copy">© 2026 Nexsite. All rights reserved.</div>
-  <div class="footer-links">
-    <a href="#">Privacy</a>
-    <a href="#">Terms</a>
-    <a href="#">Contact</a>
-    <a href="#">Twitter</a>
-  </div>
-</footer>
 
 <!-- ============================================================
      JAVASCRIPT
@@ -1635,7 +1634,6 @@ const PANEL_IDS = ['hero','how','why','process','stats','pricing','faq','cta'];
 const TRANS_VH  = 45; // blur→clear and clear→blur transition in vh
 
 const _panels = PANEL_IDS.map(id => document.getElementById(id));
-const _footer  = document.getElementById('site-footer');
 const _spacer  = document.getElementById('scroll-spacer');
 
 // Per-section inner scroll targets.
@@ -1643,7 +1641,7 @@ const _spacer  = document.getElementById('scroll-spacer');
 // Sections without bg videos use the .panel-body wrapper we added.
 const _CONTENT_SEL = {
   hero: '.hero-content', how: '.how-content',
-  stats: '.stats-content', cta: '.cta-inner',
+  stats: '.stats-content',
 };
 const _targets = _panels.map((el, i) => {
   if (!el) return null;
@@ -1737,16 +1735,6 @@ function updatePanels(scroll){
     if (target) target.style.transform = ty !== 0 ? `translate3d(0,${ty}px,0)` : '';
   });
 
-  // Footer fades in during CTA active phase
-  if (_footer && _ranges[_ranges.length - 1]) {
-    const r = _ranges[_ranges.length - 1];
-    const active = r.exitStart - r.enterEnd;
-    const p = active > 0
-      ? Math.min(Math.max((scroll - r.enterEnd) / active, 0), 1)
-      : (scroll >= r.enterEnd ? 1 : 0);
-    _footer.style.opacity      = String(p);
-    _footer.style.pointerEvents = p > 0.5 ? 'all' : 'none';
-  }
 }
 
 buildRanges();
