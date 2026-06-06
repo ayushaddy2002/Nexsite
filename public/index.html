@@ -1069,7 +1069,7 @@ footer{
      HERO
      ============================================================ -->
 <section id="hero">
-  <video id="hero-video" autoplay loop muted playsinline poster="" style="filter:saturate(0)">
+  <video id="hero-video" autoplay loop muted playsinline webkit-playsinline poster="" style="filter:saturate(0)">
     <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4" type="video/mp4">
   </video>
   <div class="hero-overlay"></div>
@@ -1121,7 +1121,7 @@ footer{
      HOW IT WORKS
      ============================================================ -->
 <section id="how">
-  <video class="section-video" autoplay loop muted playsinline style="filter:saturate(0)">
+  <video class="section-video" autoplay loop muted playsinline webkit-playsinline style="filter:saturate(0)">
     <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4" type="video/mp4">
   </video>
   <div class="video-overlay-dark"></div>
@@ -1281,7 +1281,7 @@ footer{
      STATS
      ============================================================ -->
 <section id="stats">
-  <video class="section-video" autoplay loop muted playsinline style="filter:saturate(0)">
+  <video class="section-video" autoplay loop muted playsinline webkit-playsinline style="filter:saturate(0)">
     <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4" type="video/mp4">
   </video>
   <div class="video-overlay-dark"></div>
@@ -1611,6 +1611,17 @@ document.getElementById('booking-form').addEventListener('submit', async functio
   } finally {
     setLoading(false);
   }
+});
+
+// ── Force autoplay on iOS ──────────────────────────────────────────────────
+// iOS ignores the autoplay HTML attribute; muted must be set as a DOM property
+// and play() must be called explicitly. The promise catch suppresses console errors.
+document.querySelectorAll('video').forEach(v => {
+  v.muted = true;
+  v.setAttribute('playsinline', '');
+  v.setAttribute('webkit-playsinline', '');
+  const p = v.play();
+  if (p !== undefined) p.catch(() => {});
 });
 
 // ── Hero logo video — play once muted, freeze on last frame ───────────────
