@@ -1692,7 +1692,9 @@ function buildRanges(){
     return r;
   });
 
-  if (_spacer) _spacer.style.height = cursor + 'px';
+  // Add one vh so the user can scroll far enough for the last section to fully enter.
+  // max scrollY = spacer.height - vh, so without this the CTA is unreachable.
+  if (_spacer) _spacer.style.height = (cursor + vh) + 'px';
 }
 
 function updatePanels(scroll){
