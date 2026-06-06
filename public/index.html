@@ -187,8 +187,13 @@ img,video{display:block}
 #hero,#how,#why,#process,#stats,#pricing,#faq,#cta{
   position:fixed;top:0;left:0;right:0;height:100vh;
   overflow:hidden;
-  will-change:opacity,transform,filter;
+  will-change:opacity,filter;
 }
+/* inner scroll targets — these translate, not the sections */
+.hero-content,.how-content,.stats-content,.cta-inner,.panel-body{
+  will-change:transform;
+}
+.panel-body{width:100%}
 /* Z-indices: hero highest (covers everything), cta lowest */
 #hero{z-index:88}#how{z-index:87}#why{z-index:86}
 #process{z-index:85}#stats{z-index:84}
@@ -1168,6 +1173,7 @@ footer{
      WHY US GRID
      ============================================================ -->
 <section id="why">
+  <div class="panel-body">
   <div style="text-align:center">
     <div class="badge glass reveal" style="border-radius:9999px;display:inline-flex;margin-bottom:18px">Why Nexsite</div>
     <h2 class="t-display reveal reveal-d1" style="font-size:clamp(2.4rem,4.5vw,3.8rem)">The difference<br>is everything.</h2>
@@ -1202,12 +1208,14 @@ footer{
       <div class="why-desc">Every project file lives in our secure cloud storage — accessible by you, anytime. Transparency isn't optional. It's standard.</div>
     </div>
   </div>
+  </div><!-- end .panel-body -->
 </section>
 
 <!-- ============================================================
      PROCESS
      ============================================================ -->
 <section id="process">
+  <div class="panel-body">
   <div style="max-width:900px;margin:0 auto">
     <div class="badge glass reveal" style="border-radius:9999px;display:inline-flex;margin-bottom:18px">Our Process</div>
     <h2 class="t-display reveal reveal-d1" style="font-size:clamp(2.4rem,4.5vw,3.8rem);max-width:600px">
@@ -1266,6 +1274,7 @@ footer{
       </div>
     </div>
   </div>
+  </div><!-- end .panel-body -->
 </section>
 
 <!-- ============================================================
@@ -1307,6 +1316,7 @@ footer{
      PRICING
      ============================================================ -->
 <section id="pricing">
+  <div class="panel-body">
   <div style="text-align:center">
     <div class="badge glass reveal" style="border-radius:9999px;display:inline-flex;margin-bottom:18px">Our Plans</div>
     <h2 class="t-display reveal reveal-d1" style="font-size:clamp(2.4rem,4.5vw,3.8rem)">Find the plan<br>that fits you.</h2>
@@ -1362,12 +1372,14 @@ footer{
       <a href="https://wa.me/918123454398" target="_blank" rel="noopener" class="btn btn-primary glass-strong" style="border-radius:9999px;width:100%;justify-content:center;border:1px solid rgba(255,255,255,.18)">Book a Call</a>
     </div>
   </div>
+  </div><!-- end .panel-body -->
 </section>
 
 <!-- ============================================================
      FAQ
      ============================================================ -->
 <section id="faq">
+  <div class="panel-body">
   <div style="text-align:center">
     <div class="badge glass reveal" style="border-radius:9999px;display:inline-flex;margin-bottom:18px">FAQ</div>
     <h2 class="t-display reveal reveal-d1" style="font-size:clamp(2.4rem,4.5vw,3.8rem)">Questions we<br>hear often.</h2>
@@ -1428,6 +1440,7 @@ footer{
       <div class="faq-answer">Yes. We offer in-person meetings for clients who prefer face-to-face discussions. Contact us to schedule a meeting at a time and location that works for you. We believe real relationships build better products.</div>
     </div>
   </div>
+  </div><!-- end .panel-body -->
 </section>
 
 <!-- ============================================================
@@ -1636,62 +1649,71 @@ const lenis = new Lenis({
 
 // ── Full-site section panel manager ───────────────────────────────────────
 const PANEL_IDS = ['hero','how','why','process','stats','pricing','faq','cta'];
-const TRANS_VH  = 45; // enter/exit transition in vh
+const TRANS_VH  = 45; // blur→clear and clear→blur transition in vh
 
 const _panels = PANEL_IDS.map(id => document.getElementById(id));
 const _footer  = document.getElementById('site-footer');
 const _spacer  = document.getElementById('scroll-spacer');
+
+// Per-section inner scroll targets.
+// Sections with bg videos use their existing content div.
+// Sections without bg videos use the .panel-body wrapper we added.
+const _CONTENT_SEL = {
+  hero: '.hero-content', how: '.how-content',
+  stats: '.stats-content', cta: '.cta-inner',
+};
+const _targets = _panels.map((el, i) => {
+  if (!el) return null;
+  const sel = _CONTENT_SEL[PANEL_IDS[i]];
+  return sel ? el.querySelector(sel) : el.querySelector('.panel-body');
+});
 
 let _ranges = [];
 
 function easeInOut(t){ return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
 function buildRanges(){
-  const vh     = window.innerHeight;
-  const TRAN   = TRANS_VH * vh / 100;
-  let   cursor = 0;
+  const vh   = window.innerHeight;
+  const TRAN = TRANS_VH * vh / 100;
+  let cursor = 0;
 
-  _ranges = _panels.map((el) => {
-    // How much content overflows the viewport
+  _ranges = _panels.map((el, i) => {
+    // Measure overflow using the section's full scrollHeight (includes padding + content).
+    // overflow:hidden doesn't suppress scrollHeight — it returns the true content height.
     const overflow = el ? Math.max(0, el.scrollHeight - vh) : 0;
     const totalPx  = TRAN + overflow + TRAN;
-    const r = {
-      start:     cursor,
-      enterEnd:  cursor + TRAN,
-      exitStart: cursor + TRAN + overflow,
-      end:       cursor + totalPx,
-      overflow,
-    };
+    const r = { start: cursor, enterEnd: cursor + TRAN,
+                exitStart: cursor + TRAN + overflow, end: cursor + totalPx, overflow };
     cursor += totalPx;
     return r;
   });
 
-  // Set spacer height so page is scrollable
-  if(_spacer) _spacer.style.height = cursor + 'px';
+  if (_spacer) _spacer.style.height = cursor + 'px';
 }
 
 function updatePanels(){
   const scroll = window.scrollY;
 
   _panels.forEach((el, i) => {
-    if(!el || !_ranges[i]) return;
+    if (!el || !_ranges[i]) return;
     const r = _ranges[i];
+    const target = _targets[i];
 
     let opacity, blur, ty = 0;
 
-    if(scroll <= r.start){
+    if (scroll <= r.start) {
       opacity = i === 0 ? 1 : 0;
       blur    = i === 0 ? 0 : 20;
-    } else if(scroll < r.enterEnd){
-      // Blur → clear
+    } else if (scroll < r.enterEnd) {
+      // Blur → clear (content stays at rest position)
       const e = easeInOut((scroll - r.start) / (r.enterEnd - r.start));
-      opacity = e; blur = 20 * (1 - e); ty = 0;
-    } else if(scroll < r.exitStart){
-      // Fully active — scroll content up via translateY
+      opacity = e; blur = 20 * (1 - e);
+    } else if (scroll < r.exitStart) {
+      // Fully clear — translate inner content upward to reveal overflow
       opacity = 1; blur = 0;
       ty = -(scroll - r.enterEnd);
-    } else if(scroll < r.end){
-      // Clear → blur (content stays at end position)
+    } else if (scroll < r.end) {
+      // Clear → blur (inner content stays at end position)
       const e = easeInOut((scroll - r.exitStart) / (r.end - r.exitStart));
       opacity = 1 - e; blur = 20 * e;
       ty = -r.overflow;
@@ -1700,14 +1722,18 @@ function updatePanels(){
       ty = -r.overflow;
     }
 
+    // opacity + blur on the section element (the fixed clip window)
     el.style.opacity      = String(opacity);
     el.style.filter       = `blur(${blur}px)`;
-    el.style.transform    = `translate3d(0,${ty}px,0)`;
+    el.style.transform    = '';          // section never moves
     el.style.pointerEvents = opacity > 0.05 ? 'all' : 'none';
+
+    // translateY on the inner content element so it scrolls inside the clip window
+    if (target) target.style.transform = ty !== 0 ? `translate3d(0,${ty}px,0)` : '';
   });
 
   // Footer fades in during CTA active phase
-  if(_footer && _ranges[_ranges.length - 1]){
+  if (_footer && _ranges[_ranges.length - 1]) {
     const r = _ranges[_ranges.length - 1];
     const active = r.exitStart - r.enterEnd;
     const p = active > 0
