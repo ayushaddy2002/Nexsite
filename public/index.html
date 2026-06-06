@@ -1680,9 +1680,10 @@ function buildRanges(){
     const overflow = el ? Math.max(0, el.scrollHeight - vh) : 0;
     let r;
     if (i === 0) {
-      // Hero is already fully visible at scroll=0 — no enter transition.
-      // enterEnd = start = 0 so it's immediately in its active/exit phase.
-      r = { start: 0, enterEnd: 0, exitStart: overflow, end: overflow + TRAN, overflow };
+      // Hero: no enter transition (already visible at scroll=0), no content scrolling.
+      // overflow is forced to 0 — hero never translates its content up/down,
+      // it simply dwells for TRAN px then fades over TRAN px.
+      r = { start: 0, enterEnd: 0, exitStart: TRAN, end: 2 * TRAN, overflow: 0 };
       cursor = r.end;
     } else {
       const totalPx = TRAN + overflow + TRAN;
