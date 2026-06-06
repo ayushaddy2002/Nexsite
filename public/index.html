@@ -1645,7 +1645,7 @@ document.querySelectorAll('#hero-video, .section-video').forEach(v => {
 
 // ── Full-site section panel manager ───────────────────────────────────────
 const PANEL_IDS = ['hero','how','why','process','stats','pricing','faq','cta'];
-const TRANS_VH  = 45; // blur→clear and clear→blur transition in vh
+const TRANS_VH  = 35; // blur→clear and clear→blur transition in vh
 
 const _panels = PANEL_IDS.map(id => document.getElementById(id));
 const _spacer  = document.getElementById('scroll-spacer');
@@ -1678,8 +1678,8 @@ function buildRanges(){
     if (i === 0) {
       // Hero: no enter transition (already visible at scroll=0), no content scrolling.
       // overflow is forced to 0 — hero never translates its content up/down,
-      // Dwell for 2×TRAN (matches enter+active of other sections), fade over TRAN.
-      r = { start: 0, enterEnd: 0, exitStart: 2 * TRAN, end: 3 * TRAN, overflow: 0 };
+      // Dwell for TRAN, fade over TRAN — matches the enter+exit timing of other sections.
+      r = { start: 0, enterEnd: 0, exitStart: TRAN, end: 2 * TRAN, overflow: 0 };
       cursor = r.end;
     } else {
       const isLast = i === _panels.length - 1;
