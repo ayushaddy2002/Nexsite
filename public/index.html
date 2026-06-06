@@ -625,9 +625,12 @@ img,video{display:block}
   display:flex;flex-direction:column;
 }
 .cta-inner{
-  position:relative;z-index:3;flex:1;
+  position:relative;z-index:3;
   display:flex;flex-direction:column;align-items:center;
-  text-align:center;padding:60px 60px;justify-content:center;
+  text-align:center;
+  padding:80px 60px 120px; /* bottom padding leaves room for the footer */
+  justify-content:center;
+  height:100%;box-sizing:border-box;
 }
 .cta-h2{
   font-size:clamp(3.2rem,7.5vw,6rem);
@@ -638,9 +641,9 @@ img,video{display:block}
   max-width:480px;line-height:1.65;margin-bottom:44px;
   font-family:var(--font-body);
 }
-.cta-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:80px}
+.cta-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 footer{
-  position:relative;z-index:3;width:100%;
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
   padding:32px 60px;
   border-top:1px solid rgba(255,255,255,.07);
   display:flex;align-items:center;justify-content:space-between;
@@ -758,7 +761,7 @@ footer{
   footer{padding-left:20px;padding-right:20px}
   #features,#why,#process,#testimonials,#pricing,#faq{padding-top:72px;padding-bottom:72px}
   .how-content{padding-top:96px;padding-bottom:96px}
-  .cta-inner{padding-top:60px}
+  .cta-inner{padding-top:80px;padding-bottom:100px}
 
   .chess-row{gap:28px;margin-bottom:56px}
   .chess-title{font-size:clamp(1.5rem,5vw,1.9rem)}
