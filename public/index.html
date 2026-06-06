@@ -1677,13 +1677,19 @@ function buildRanges(){
   let cursor = 0;
 
   _ranges = _panels.map((el, i) => {
-    // Measure overflow using the section's full scrollHeight (includes padding + content).
-    // overflow:hidden doesn't suppress scrollHeight — it returns the true content height.
     const overflow = el ? Math.max(0, el.scrollHeight - vh) : 0;
-    const totalPx  = TRAN + overflow + TRAN;
-    const r = { start: cursor, enterEnd: cursor + TRAN,
-                exitStart: cursor + TRAN + overflow, end: cursor + totalPx, overflow };
-    cursor += totalPx;
+    let r;
+    if (i === 0) {
+      // Hero is already fully visible at scroll=0 — no enter transition.
+      // enterEnd = start = 0 so it's immediately in its active/exit phase.
+      r = { start: 0, enterEnd: 0, exitStart: overflow, end: overflow + TRAN, overflow };
+      cursor = r.end;
+    } else {
+      const totalPx = TRAN + overflow + TRAN;
+      r = { start: cursor, enterEnd: cursor + TRAN,
+            exitStart: cursor + TRAN + overflow, end: cursor + totalPx, overflow };
+      cursor += totalPx;
+    }
     return r;
   });
 
