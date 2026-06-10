@@ -719,6 +719,61 @@ footer{
    ============================================================ */
 @media(min-width:769px){
   .marquee-section{margin-top:32px}
+
+  /* Section videos become full-bleed backgrounds on desktop
+     (on mobile they stay in-flow as banners above the content).
+     Content divs already sit at z-index:3. */
+  #how .section-video,#stats .section-video{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;z-index:0;
+  }
+  .video-overlay-dark{
+    position:absolute;inset:0;z-index:1;
+    background:rgba(0,0,0,.62);pointer-events:none;
+  }
+  .fade-top-200{
+    position:absolute;top:0;left:0;right:0;height:200px;z-index:1;
+    background:linear-gradient(180deg,#000,rgba(0,0,0,0));pointer-events:none;
+  }
+  .fade-bottom-200{
+    position:absolute;bottom:0;left:0;right:0;height:200px;z-index:1;
+    background:linear-gradient(0deg,#000,rgba(0,0,0,0));pointer-events:none;
+  }
+
+  /* Center hero content vertically (mobile keeps flex-start) */
+  .hero-content{justify-content:center}
+
+  /* Center section content vertically when it's shorter than the
+     viewport. Auto margins collapse to 0 once content overflows,
+     so the panel manager's inner scrolling is unaffected. */
+  #why,#process,#pricing,#faq{display:flex;flex-direction:column}
+  #why .panel-body,#process .panel-body,
+  #pricing .panel-body,#faq .panel-body{
+    flex:0 0 auto;margin-top:auto;margin-bottom:auto;
+  }
+  .how-content{flex:0 0 auto;margin-top:auto;margin-bottom:auto}
+
+  /* Keep the why-grid from stretching edge-to-edge on wide screens */
+  .why-grid{max-width:1080px;margin-left:auto;margin-right:auto}
+}
+
+/* Narrow desktop / tablet landscape — keep the navbar on one line */
+@media(min-width:769px) and (max-width:1080px){
+  #navbar{padding-left:24px;padding-right:24px}
+  #navbar.scrolled{padding-left:24px;padding-right:24px}
+  .nav-center a{padding:7px 10px}
+}
+
+/* Shorter laptop viewports — compact the hero so nothing clips.
+   The hero never scrolls internally, so it must fit in one screen. */
+@media(min-width:769px) and (max-height:820px){
+  .hero-content{padding-top:64px}
+  #hero-logo-video{width:140px;height:140px}
+  .hero-card{padding:28px 48px !important}
+  .hero-h1{font-size:clamp(2.2rem,4.2vw,3.2rem);margin-bottom:18px}
+  .hero-sub{font-size:14px;margin-bottom:26px}
+  .hero-partners{padding-top:0;margin-top:14px}
+  .how-content{padding-top:100px;padding-bottom:100px}
 }
 
 /* ============================================================
@@ -1468,7 +1523,7 @@ footer{
     <div class="footer-links">
       <a href="#">Privacy</a>
       <a href="#">Terms</a>
-      <a href="#">Contact</a>
+      <a href="https://wa.me/918123454398" target="_blank" rel="noopener">Contact</a>
       <a href="#">Twitter</a>
     </div>
   </footer>
