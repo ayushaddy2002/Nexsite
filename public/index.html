@@ -130,6 +130,29 @@ img,video{display:block}
 .reveal-d4{transition-delay:.4s}
 
 /* ============================================================
+   PRELOADER
+   ============================================================ */
+#preloader{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .65s ease,visibility .65s;
+}
+#preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+#preloader img{
+  width:clamp(110px,16vw,160px);height:auto;
+  animation:preloaderPulse 1.5s ease-in-out infinite;
+}
+@keyframes preloaderPulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.45;transform:scale(.93)}
+}
+/* Hold the hero entrance animations until the preloader lifts */
+body.loading .hero-badge,body.loading .hero-h1,
+body.loading .hero-sub,body.loading .hero-btns,
+body.loading .hero-partners{animation-play-state:paused}
+
+/* ============================================================
    NAVBAR
    ============================================================ */
 #navbar{
@@ -1010,7 +1033,14 @@ footer{
 }
 </style>
 </head>
-<body>
+<body class="loading">
+
+<!-- ============================================================
+     PRELOADER
+     ============================================================ -->
+<div id="preloader" aria-hidden="true">
+  <img src="image.png" alt="">
+</div>
 
 <!-- ============================================================
      BOOKING MODAL
@@ -1531,6 +1561,28 @@ footer{
      JAVASCRIPT
      ============================================================ -->
 <script>
+// ── Preloader ──────────────────────────────────────────────────────────────
+(function(){
+  const pre = document.getElementById('preloader');
+  const t0  = performance.now();
+  const MIN_SHOW = 900; // ms — avoid a flash on fast loads
+  let hidden = false;
+  function hide(){
+    if (hidden || !pre) return;
+    hidden = true;
+    const wait = Math.max(0, MIN_SHOW - (performance.now() - t0));
+    setTimeout(() => {
+      pre.classList.add('done');
+      document.body.classList.remove('loading'); // hero entrance starts now
+      const logo = document.getElementById('hero-logo-video');
+      if (logo) { try { logo.currentTime = 0; const p = logo.play(); if (p) p.catch(()=>{}); } catch(e){} }
+      setTimeout(() => pre.remove(), 800);
+    }, wait);
+  }
+  window.addEventListener('load', hide);
+  setTimeout(hide, 5000); // fallback — never trap the user on the loader
+})();
+
 // ── Scroll reveal ──────────────────────────────────────────────────────────
 const revealEls = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver(entries => {
