@@ -1839,6 +1839,19 @@ function updatePanels(scroll){
 buildRanges();
 window.addEventListener('resize', buildRanges);
 
+// ── Anchor navigation ──────────────────────────────────────────────────────
+// Sections are position:fixed, so native #hash jumps have nowhere to go.
+// Intercept nav clicks and scroll to the section's range instead.
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  const id  = a.getAttribute('href').slice(1);
+  const idx = PANEL_IDS.indexOf(id);
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const top = idx === -1 ? 0 : _ranges[idx].enterEnd; // href="#" → top
+    window.scrollTo({ top, behavior: 'smooth' });
+  });
+});
+
 // Native scroll — sections are position:fixed so no library needed.
 // A lightweight lerp gives smooth visual transitions on desktop too.
 let _lerpScroll = 0;
